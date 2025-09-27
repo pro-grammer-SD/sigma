@@ -1,4 +1,6 @@
 import os
+import subprocess
+import pathlib
 import ntplib
 from datetime import datetime, timezone
 from dotenv import load_dotenv
@@ -36,6 +38,19 @@ def speak(text):
         output_format="mp3_44100_128",
     )
     play(audio)
+    
+def run_elevated(script_path: str, timeout: int | None = None) -> bool:
+    p = pathlib.Path(script_path).expanduser().resolve()
+    ps_cmd = f"Start-Process -FilePath '{p}' -Verb RunAs -Wait -PassThru | Select-Object -ExpandProperty ExitCode"
+    proc = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", ps_cmd],
+        capture_output=True, text=True, timeout=timeout
+    )
+    out = proc.stdout.strip()
+    try:
+        return int(out) == 0
+    except Exception:
+        return False
 
 def set_brightness_level(percent):
     percent = max(0, min(100, percent))
@@ -161,6 +176,12 @@ while True:
         elif contains_all(["sigma", "desktop"], result):
             speak("showing desktop")
             pyautogui.hotkey("win", "d")
+            
+        elif contains_all(["sigma", "optimize"], result):
+            speak("optimising your fricking potato pc")
+            scripts = ["scripts\\opt1.bat", "scripts\\opt2.bat", "scripts\\opt3.bat"]
+            for s in scripts:
+                run_elevated(s)
         
     except Exception as e:
         print(f"❌ Error: {e}")
