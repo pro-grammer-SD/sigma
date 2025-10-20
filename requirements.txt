@@ -1,0 +1,11 @@
+ntplib
+python-dotenv
+sounddevice
+scipy
+elevenlabs
+comtypes
+pycaw
+pyautogui
+screen-brightness-control
+word2number
+google-genai
